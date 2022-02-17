@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="guet_card">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <title>guet_card</title>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    function getCookie(cookie_name) {
+      if (document.cookie.length > 0) {
+        var cookie_start = document.cookie.indexOf(cookie_name+"=");
+        if (cookie_start > -1) {
+          cookie_start = cookie_start + cookie_name.length + 1;
+          cookie_end = document.cookie.indexOf(";", cookie_start);
+          if (cookie_end == -1)
+            cookie_end = document.cookie.length;
+          var result = unescape(document.cookie.substring(cookie_start, cookie_end));
+          console.log("Got cookie:", cookie_name, result);
+          return result;
+        }
+      } else {
+        console.log("Got cookie:", cookie_name, null);
+        return null;
+      }
+    }
+    function setCookie(c_name,value,expiredays)
+    {
+      console.log("Setting cookie:", c_name, value);
+      var exdate = new Date();
+      exdate.setDate(exdate.getDate()+expiredays);
+      document.cookie = c_name + "=" + escape(value) +
+        ((expiredays==null) ? "" : (";expires=" + exdate.toGMTString()))
+    }
+    var version = navigator.appVersion;
+    if (version.includes("Safari")
+      && version.includes("Version/15")) {
+        console.log("Running on Safari 15, will force using HTML as renderer.");
+        window.flutterWebRenderer = "html";
+        if (getCookie("showConfirm") != "false" && window.navigator.standalone == false) {
+          var r = window.confirm(
+            "您正在使用 iOS 15 操作系统，由于 iOS 15 自身的 bug，您需要进行一些设置来保证程序正常加载。\n点击确定为您跳转到教程，一旦确定，将来启动时不会再显示此信息。");
+          if (r) {
+            // 用户确认
+            setCookie("showConfirm", "false");
+            window.location.href = "https://gitee.com/guetcard/guetcard/issues/I4BET6#note_6779529_link";
+          } else {
+            // 用户取消
+          }
+        }
+    }
+  </script>
+</head>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <div align="center" style="font-size:36px">程序正在加载中，请稍候...</div>
+  <script>
+    var serviceWorkerVersion = '3746826478';
+    var scriptLoaded = false;
+    function loadMainDartJs() {
+      if (scriptLoaded) {
+        return;
+      }
+      scriptLoaded = true;
+      var scriptTag = document.createElement('script');
+      scriptTag.src = 'main.dart.js';
+      scriptTag.type = 'application/javascript';
+      document.body.append(scriptTag);
+    }
+
+    if ('serviceWorker' in navigator) {
+      // Service workers are supported. Use them.
+      window.addEventListener('load', function () {
+        // Wait for registration to finish before dropping the <script> tag.
+        // Otherwise, the browser will load the script multiple times,
+        // potentially different versions.
+        var serviceWorkerUrl = 'flutter_service_worker.js?v=' + serviceWorkerVersion;
+        navigator.serviceWorker.register(serviceWorkerUrl)
+          .then((reg) => {
+            function waitForActivation(serviceWorker) {
+              serviceWorker.addEventListener('statechange', () => {
+                if (serviceWorker.state == 'activated') {
+                  console.log('Installed new service worker.');
+                  loadMainDartJs();
+                }
+              });
+            }
+            if (!reg.active && (reg.installing || reg.waiting)) {
+              // No active web worker and we have installed or are installing
+              // one for the first time. Simply wait for it to activate.
+              waitForActivation(reg.installing ?? reg.waiting);
+            } else if (!reg.active.scriptURL.endsWith(serviceWorkerVersion)) {
+              // When the app updates the serviceWorkerVersion changes, so we
+              // need to ask the service worker to update.
+              console.log('New service worker available.');
+              reg.update();
+              waitForActivation(reg.installing);
+            } else {
+              // Existing service worker is still good.
+              console.log('Loading app from service worker.');
+              loadMainDartJs();
+            }
+          });
+
+        // If service worker doesn't succeed in a reasonable amount of time,
+        // fallback to plaint <script> tag.
+        setTimeout(() => {
+          if (!scriptLoaded) {
+            console.warn(
+              'Failed to load app from service worker. Falling back to plain <script> tag.',
+            );
+            loadMainDartJs();
+          }
+        }, 4000);
+      });
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+</body>
+</html>
